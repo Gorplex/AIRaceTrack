@@ -1,12 +1,13 @@
 
-from numpy import sin, cos
 import numpy as np
+from numpy import sin, cos
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import time
 
-
 import keyboard
+
+from CollisionChecks import *
 
 #grid size
 CORD_X = 35
@@ -15,6 +16,13 @@ INNER_TRACK_PATH = np.array([[-14.,-14.,14.,-10.,-10.,14.,-14.], [-14.,14.,14.,6
 OUTER_TRACK_PATH = np.array([[-17.,-17.,17.,17.,-5.,-5.,17.,17.,-17.], [-17.,17.,17.,10.,4.,-4.,-10.,-17.,-17.]])
 INNER_LINES = []
 OUTER_LINES = []
+
+
+def PointsToLineSegments(points):
+    lineList = []  
+    for i in range(len(points[0])-1):
+        lineList.append(np.array([points[0][i:i+2],points[1][i:i+2]]))
+    return np.array(lineList)
 
 #car
 CAR_WIDTH = .5
@@ -28,63 +36,6 @@ CAR_ACC = 1
 CAR_DRAG = .333
 CAR_ROT_SPEED = 1.25
 
-
-def PointsToLineSegments(points):
-    lineList = []  
-    for i in range(len(points[0])-1):
-        lineList.append(np.array([points[0][i:i+2],points[1][i:i+2]]))
-    return np.array(lineList)
-
-def __intesectingHelper(ab1, ab2):
-    x1 = ab1[0][0]
-    x2 = ab1[0][1]
-    x3 = ab2[0][0]
-    x4 = ab2[0][1]
-    y1 = ab1[1][0]
-    y2 = ab1[1][1]
-    y3 = ab2[1][0]
-    y4 = ab2[1][1]    
-    #collision Dection from http://www.jeffreythompson.org/collision-detection/line-line.php
-    uA = ((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
-    uB = ((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
-    return [uA, uB]
-
-def isIntersecting(ab1, ab2):
-    uA,uB = __intesectingHelper(ab1, ab2)
-    if (uA >= 0 and uA <= 1 and uB >= 0 and uB <= 1):
-        return True;
-    return False;
-
-def getIntersect(ab1, ab2):
-    x1 = ab1[0][0]
-    x2 = ab1[0][1]
-    y1 = ab1[1][0]
-    y2 = ab1[1][1]
-    uA,uB = __intesectingHelper(ab1, ab2)
-    if (uA >= 0 and uA <= 1 and uB >= 0 and uB <= 1):
-        interX = x1 + (uA * (x2-x1));
-        interY = y1 + (uA * (y2-y1));
-        return [interX, interY]
-    return False
-
-def getClosestIntersect(ab1, ab2list):
-    x1 = ab1[0][0]
-    x2 = ab1[0][1]
-    y1 = ab1[1][0]
-    y2 = ab1[1][1]
-    bestX = float("inf")
-    bestY = float("inf")
-    for ab2 in ab2list:
-        uA,uB = __intesectingHelper(ab1, ab2)
-        if (uA >= 0 and uA <= 1 and uB >= 0 and uB <= 1):
-            interX = x1 + (uA * (x2-x1));
-            interY = y1 + (uA * (y2-y1));
-            if(abs(interX-x1)<abs(bestX-x1)):
-                bestX=interX
-                bestY=interY
-    if(bestX < float("inf")):
-        return [bestX, bestY]
-    return False
 
 def genVisionLines():
     radStep = 2*np.pi/NUM_VISION_LINES
@@ -209,6 +160,7 @@ class Car:
         self.position[1] + rotated[1]])
     
         
+
 #------------------------------------------------------------
 # set up initial state and global variables
 dt = 1./40 # 40 fps
