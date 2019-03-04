@@ -4,8 +4,8 @@ from numpy import sin, cos
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import time
-
 import keyboard
+import random
 
 from CollisionChecks import *
 
@@ -17,12 +17,17 @@ OUTER_TRACK_PATH = np.array([[-17.,-17.,17.,17.,-5.,-5.,17.,17.,-17.], [-17.,17.
 INNER_LINES = []
 OUTER_LINES = []
 
+RANDOM_CONTOLL = True
+
 
 def PointsToLineSegments(points):
     lineList = []  
     for i in range(len(points[0])-1):
         lineList.append(np.array([points[0][i:i+2],points[1][i:i+2]]))
     return np.array(lineList)
+
+def randBool():
+    return bool(random.getrandbits(1))
 
 #car
 CAR_WIDTH = .5
@@ -37,28 +42,6 @@ CAR_DRAG = .333
 CAR_ROT_SPEED = 1.25
 
 
-def genVisionLines():
-    radStep = 2*np.pi/NUM_VISION_LINES
-    x = np.array([0.])
-    y = np.array([0.])
-    for i in range(NUM_VISION_LINES):
-        x = np.concatenate((x, RAD_VISION_LINES*cos(i*radStep)), axis=None)
-        y = np.concatenate((y, RAD_VISION_LINES*sin(i*radStep)), axis=None)
-        x = np.concatenate((x, 0.), axis=None)
-        y = np.concatenate((y, 0.), axis=None)
-    return [x,y]
-
-def checkKeys():
-    inputs = [False,False,False,False]
-    if keyboard.is_pressed('w'):
-        inputs[0] = True
-    if keyboard.is_pressed('s'):
-        inputs[1] = True
-    if keyboard.is_pressed('a'):
-        inputs[2] = True
-    if keyboard.is_pressed('d'):
-        inputs[3] = True
-    return inputs
 
 class Car:
     
@@ -69,10 +52,36 @@ class Car:
         self.position = np.array([-15.,-15.])
         self.rotation = np.pi/2
         self.vel = np.array([0.,0.])
-        self.visionLines = genVisionLines()
+        self.visionLines = Car.genVisionLines()
         self.lastUpdate = time.time()
         self.nextUpdate = 0.0
         self.deltaT = 0.0
+    
+    def genVisionLines():
+        radStep = 2*np.pi/NUM_VISION_LINES
+        x = np.array([0.])
+        y = np.array([0.])
+        for i in range(NUM_VISION_LINES):
+            x = np.concatenate((x, RAD_VISION_LINES*cos(i*radStep)), axis=None)
+            y = np.concatenate((y, RAD_VISION_LINES*sin(i*radStep)), axis=None)
+            x = np.concatenate((x, 0.), axis=None)
+            y = np.concatenate((y, 0.), axis=None)
+        return [x,y]
+
+    def getKeyInput():
+        inputs = [False,False,False,False]
+        if keyboard.is_pressed('w'):
+            inputs[0] = True
+        if keyboard.is_pressed('s'):
+            inputs[1] = True
+        if keyboard.is_pressed('a'):
+            inputs[2] = True
+        if keyboard.is_pressed('d'):
+            inputs[3] = True
+        return np.array(inputs)
+        
+    def getRandomInput():
+        return np.array([randBool(), randBool(), randBool(), randBool()])
         
     def update(self, inputs):
         self.nextUpdate = time.time()
@@ -234,7 +243,10 @@ def animate(i):
         frameCount = 0
         lastRealTime = nextRealTime
     
-    car.update(checkKeys())
+    if RANDOM_CONTOLL:
+        car.update(Car.getRandomInput())
+    else:
+        car.update(Car.getKeyInput())
   
     line.set_data(car.getPlot())
     visionPlot.set_data(car.getVisionLines())
