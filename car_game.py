@@ -192,10 +192,9 @@ car = Car()
 fig = plt.figure()
 ax = fig.add_subplot(111, aspect='equal', autoscale_on=False,
                      xlim=(-CORD_X, CORD_X), ylim=(-CORD_Y, CORD_Y))
-#ax.grid()
-ax.xticks([])
-ax.yticks([])
-ax.grid(False)
+plt.xticks([])
+plt.yticks([])
+plt.grid(False)
 
 #car lines
 line, = ax.plot([], [], lw=1)
