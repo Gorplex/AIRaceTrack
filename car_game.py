@@ -48,6 +48,18 @@ def genVisionLines():
         y = np.concatenate((y, 0.), axis=None)
     return [x,y]
 
+def checkKeys():
+    inputs = [False,False,False,False]
+    if keyboard.is_pressed('w'):
+        inputs[0] = True
+    if keyboard.is_pressed('s'):
+        inputs[1] = True
+    if keyboard.is_pressed('a'):
+        inputs[2] = True
+    if keyboard.is_pressed('d'):
+        inputs[3] = True
+    return inputs
+
 class Car:
     
     #rotation in rads from [1,0] counterclockwise
@@ -62,27 +74,26 @@ class Car:
         self.nextUpdate = 0.0
         self.deltaT = 0.0
         
-    def updateFromKeybaord(self):
+    def update(self, inputs):
         self.nextUpdate = time.time()
         if(self.nextUpdate >= self.lastUpdate):
             self.deltaT = self.nextUpdate - self.lastUpdate
             
-            self.__checkKeys()
+            self.__applyInputs(inputs)
             if self.__updatePhys():
                 return True
             
             self.lastUpdate = self.nextUpdate
-            
             return False
         
-    def __checkKeys(self):
-        if keyboard.is_pressed('w'):
+    def __applyInputs(self, inputs):
+        if inputs[0]:
             self.vel += CAR_ACC * np.array([cos(self.rotation), sin(self.rotation)]) * self.deltaT
-        if keyboard.is_pressed('s'):
+        if inputs[1]:
             self.vel -= CAR_ACC * np.array([cos(self.rotation), sin(self.rotation)]) * self.deltaT
-        if keyboard.is_pressed('a'):
+        if inputs[2]:
             self.rotation += CAR_ROT_SPEED * self.deltaT
-        if keyboard.is_pressed('d'):
+        if inputs[3]:
             self.rotation -= CAR_ROT_SPEED * self.deltaT
     
     def __updatePhys(self):
@@ -219,7 +230,7 @@ def animate(i):
         frameCount = 0
         lastRealTime = nextRealTime
     
-    car.updateFromKeybaord()
+    car.update(checkKeys())
   
     line.set_data(car.getPlot())
     visionPlot.set_data(car.getVisionLines())
