@@ -144,9 +144,9 @@ class Car:
             
         if (np.linalg.norm(self.vel) > CAR_MAX_VEL):
             ang = np.arctan2(self.vel[1], self.vel[0])
-            self.vel = CAR_MAX_VEL * np.array([cos(ang), sin(ang)]) * self.deltaT
+            self.vel = CAR_MAX_VEL * np.array([cos(ang), sin(ang)])
         if(np.linalg.norm(self.vel) <= CAR_DRAG * self.deltaT):
-            self.vel  = np.array([0.,0.]) * self.deltaT
+            self.vel  = np.array([0.,0.])
         
         self.position += self.vel    
         return False
