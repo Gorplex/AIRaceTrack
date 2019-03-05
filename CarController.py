@@ -36,6 +36,12 @@ class Car:
         self.nextUpdate = 0.0
         self.deltaT = 0.0
     
+    def getPos(self):
+        return self.position
+        
+    def getVel(self):
+        return self.vel    
+        
     def genVisionLines():
         radStep = 2*np.pi/NUM_VISION_LINES
         x = np.array([0.])
@@ -136,6 +142,9 @@ class Car:
     
     def getVisionLines(self):
         return self.carFrameTransform(self.visionLines)   
+    
+    def getRadar(self):
+        return self.getVisionCollisions()
     
     def getVisionCollisions(self):
         visionLines = self.getVisionLines()

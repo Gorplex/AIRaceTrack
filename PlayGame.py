@@ -7,6 +7,7 @@ import random
 
 from CarController import *
 from TrackDef import *
+from DataCollector import *
 
 
 
@@ -23,8 +24,9 @@ frameTime = 0.0
 frameCount = 0
 frameRate = 0.0
 lifeTime = 0.0
-car = Car()
-
+#car = Car()
+dataCollector = DataCollector()
+car = dataCollector.getCar()
 
 #------------------------------------------------------------
 # set up figure and animation
@@ -76,9 +78,12 @@ def animate(i):
         lastRealTime = nextRealTime
     
     if RANDOM_CONTOLL:
-        car.update(Car.getRandomInput())
+        #car.update(Car.getRandomInput())
+        dataCollector.update(Car.getRandomInput())
     else:
-        car.update(Car.getKeyInput())
+        dataCollector.update(Car.getKeyInput())
+        #car.update(Car.getKeyInput())
+        
   
     line.set_data(car.getPlot())
     visionPlot.set_data(car.getVisionLines())
@@ -107,6 +112,13 @@ def main():
     
     plt.tight_layout(pad=0, w_pad=0, h_pad=0)
     plt.show()
+    
+    
+    #print("Waiting 10s to Print Data")
+    #time.sleep(10)
+    print("Printing Data")
+    print(dataCollector.getData())
+    print(np.shape(dataCollector.getData()))
 
 
 
