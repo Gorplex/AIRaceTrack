@@ -15,7 +15,7 @@ RANDOM_CONTOLL = False
 
 #------------------------------------------------------------
 # set up initial state and global variables
-dt = 1./40 # 40 fps
+dt = 1./30 # 30 fps
 realTime  = 0.0
 satrtRealTime = time.time()
 lastRealTime = time.time()
@@ -94,9 +94,6 @@ def main():
     global INNER_LINES, OUTER_LINES
     #disable saving on the s key
     plt.rcParams['keymap.save'] = ''
-    
-    INNER_LINES = PointsToLineSegments(INNER_TRACK_PATH)
-    OUTER_LINES = PointsToLineSegments(OUTER_TRACK_PATH)
     
     # choose the interval based on dt and the time to animate one step
     t0 = time.time()
